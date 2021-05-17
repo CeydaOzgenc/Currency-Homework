@@ -1,4 +1,5 @@
 @charset "utf-8";
+/*Giriş ve Kayıt*/
 #firs{
 	display:flex;
     justify-content:center;
@@ -12,9 +13,13 @@
 	margin: 5% auto;
 	text-align:center;
 }
+#user_type, #username{
+	display: none;
+	margin: 0 8%;
+}
 .index form, .register form{
 	width: 100%;
-	background: blue;
+	background: #4389ad;
 	border-radius: 150px;
 	padding: 7% 0%;
 	display: inline-table;
@@ -35,11 +40,12 @@
 .index input[type=submit], .register input[type=submit]{
 	width: 30%;
 	border-radius:10px;
+	background:#ebebeb;
 	}
 .register input[type=checkbox]{
 	width: 25px;
 	height: 25px;
-	margin: 2% 7% 2% 0%
+	margin: 2% 7% 2% 9%
 	}
 .register label{
 	margin-right: 6%;
@@ -52,3 +58,229 @@
 .index #buton2{
 	margin:2% 0  2% 5%;
 }
+/* Navbar */
+#nav{
+	 width:100%;
+	 height:70px;
+	 background:#ebebeb;
+	 border-bottom:#4389ad solid 3px;
+	}
+.container #user{
+	  float:left;
+	  padding:16px 0;
+	  font-size: 24px;
+	}
+.container #navbar{
+	  float:right;
+	  width:75%;
+	  height:100%;
+	}
+#navbar li {	 
+      position:relative;
+	  z-index:100; 
+	  float:right;
+	  width:20%;
+	  height:100%;
+	  background:#ebebeb;
+	  text-align:center;
+	  padding:22px;
+	  box-sizing: border-box;
+      -moz-box-sizing: border-box;
+      -webkit-box-sizing: border-box;
+	  box-shadow:-5px 0px 11px 0px rgba(0, 0, 0, 0.7);
+	}
+#navbar #mobile {	  
+	  display:none;
+	  width:20%;
+	  height:50px;
+	  padding-top:30px;
+	  box-shadow:-5px 0px 11px 0px rgba(0, 0, 0, 0.7);
+	}
+#navbar a{
+	  text-decoration:none;
+	  color:#000;
+	  font:21px 'Ubuntu', sans-ser;
+	}
+#navbar a:hover li,#navbar .active li{
+	  background:#4389ad !important;
+	  color: #fff;
+	}
+#navbar #down{
+	text-decoration:none;
+	color:#000;
+	font:21px 'Ubuntu', sans-ser;
+}
+#navbar #down:hover{
+	background:#4389ad;
+	color:#fff;
+}
+#navbar .dropdown{
+	position: absolute;;
+	padding: 0px;
+	margin-top: 22px;
+	display: none;
+}
+#navbar .dropdown a{
+	color: #000;
+}
+#navbar .dropdown li,#navbar a:hover .dropdown li{
+	width: 113%;
+	padding: 10%;
+	background:#ebebeb; 
+}
+#down:hover .dropdown{
+	display: block;
+
+}
+/*Add İtem*/
+.add{
+	padding: 0px;
+	font:18px 'Ubuntu', sans-ser;
+}
+.add h1{
+	margin: 3% 0;
+	font-weight:bold;
+}
+.item{
+	float: left;
+	background: #ebebeb;
+	border-radius: 30px;
+	padding: 3%;
+}
+.additem{
+	margin-bottom: 3%;
+}
+.top{
+	margin-top: 10%;
+}
+.item h1{
+	margin:0px 0px 2% 0px;
+}
+.title {
+	background: #4389ad;
+    border-bottom-left-radius: 10px;
+    border-top-left-radius:10px;
+	font:18px 'Ubuntu', sans-ser;
+	color: #fff;
+}
+.form-control{
+	font:18px 'Ubuntu', sans-ser;
+}
+.mb-4{
+	width: 32%;
+	float: left;
+}
+.mbort{
+	margin: 0 2%;
+}
+.custom-select{
+	background: #fff;
+}
+.add input[type=submit]{
+	background: #4389ad;
+    border-radius: 10px;
+    padding: 0.5%;
+	font:20px 'Ubuntu', sans-ser;
+	color: #fff;
+}
+/*Add Money*/
+.money label{
+	background: #4389ad;
+	border-radius: 20px;
+	margin:10% 0 5% 0;
+	padding: 1%;
+	font:20px 'Ubuntu', sans-ser;
+	color: #fff;
+}
+.money h1{
+	font:20px 'Ubuntu', sans-ser;
+	margin: 0px 10px 0px 0px;
+	float: left;
+}
+.mbmoney{
+	width: 45%;
+	height: 40px;
+	margin-right: 2%;
+}
+.mbmoney input{
+	height: 100%;
+}
+/*Get İtem*/
+.query_money{
+	float: left;
+	display: none;
+	width: 79%;
+	margin-top: 2%;
+	padding: 1%;
+	background: #4389ad;
+	border-radius: 20px;
+	color:#fff;
+	font:20px 'Ubuntu', sans-ser;
+}
+.query_money h1{
+	float: left;
+	margin: 0px;
+}
+.query_money label{
+	float: left;
+	margin: 0.6% 2%;
+	font-weight: 100;
+}
+.query_money input[type=submit]{
+	float: right;
+	background: #fff;
+	color:#4389ad;
+	margin: 0px 3.7%;
+}
+/*item approval*/
+table input[type=submit]{
+	font:18px 'Ubuntu', sans-ser;
+	margin: 0px 1%;
+}
+/*home*/
+.home{
+	width: 45%;
+}
+.home .title{
+	width: 185px;
+}
+/* footer */
+#footer{
+	 width:100%;
+	 height:40px;
+	 clear:both;
+	 background:#4389ad;
+	 bottom: 0px;
+	 position: fixed;
+	}
+#footer .container #footertext{
+	 width:100%;
+	 height:100%;
+	 padding:1%;
+	 box-sizing: border-box;
+     -moz-box-sizing: border-box;
+     -webkit-box-sizing: border-box;
+	 text-align:center;
+	}
+#footer .container #footertext p{
+	 color:#fff;
+	 font:15px 'Ubuntu', sans-serif;
+	}
+#footer .container #medya{
+	 float:right;
+	 width:34%;
+	 height:100%;
+	 margin-right:1%;
+	}
+#footer .container #medya  img{
+	 float:right;
+	 height:30px;
+	 width:30px;
+	 margin:5px;
+	}
+#footer .container #medya p{
+	 float:right;
+	 color:#fff;
+	 font:17px 'Ubuntu', sans-serif;
+	 padding-top:10px;
+	}

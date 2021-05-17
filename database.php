@@ -1,5 +1,5 @@
 <?php
-	$db=mysqli_connect("localhost","root","","bourse_project");
+	$db= new mysqli("localhost","root","","bourse_project");
 	function alt_replace($string){
                 $search = array(
                     chr(0xC2) . chr(0xA0),
@@ -21,8 +21,5 @@
             	}else{
             		return addslashes(alt_replace(trim(@$_POST[$par])));
             	}
-            }
-            function g($par){
-            	return @strip_tags(alt_replace(trim(addslashes($_GET{$par}))));
             }
 ?>

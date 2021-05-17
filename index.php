@@ -10,12 +10,12 @@
 	include 'database.php';
 	if(p("login")){
 		$sql=mysqli_query($db,"select * from users where User_UserName='".p("login_username")."' and User_Password='".p("login_password")."'");
-		if(mysqli_num_rows($sql)==0){
+		if(mysqli_num_rows($sql)==0){ //input'tan girilen kullanıcı bilgileri veritabanında varmı diye kontrol edilir. 
 			echo "<script> alert ('Hatalı Giriş!'); </script>";
 		}
 		else{
-			$_SESSION["oturumacan"]=$User_UserName;
-			header("Location:anasayfa.php");
+			$_SESSION["oturumacan"]=p("login_username");
+			header("Location:home.php");
 		}
 	}
 	if(p("register")){
