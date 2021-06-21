@@ -41,9 +41,11 @@
           <?php } elseif($type[$x]=='Alıcı'){?>
             <a href="add-money.php"  class="active"><li>Para Ekle</li></a>
             <a href="get-item.php"><li>Ürün Alma</li></a>
+            <a href="report.php"><li>Rapor</li></a>
           <?php } elseif($type[$x]=='Satıcı'){?>
             <a href="add-item.php"><li>Ürün Ekle</li></a>
-          <?php } ?>
+            <?php if(count($type)<2){?> <a href="report.php"><li>Rapor</li></a> <?php } 
+          } ?>
       <?php } ?>
       <a href="home.php"><li>Profil</li></a>
       </ul>
@@ -52,17 +54,36 @@
 </div>
 <div class="container">
   <div class="col-sm-12 add money">
-    <?php $sqlonaypara=mysqli_fetch_array(mysqli_query($db,"select SUM(Money_Amount) from moneys where User_UserName='".$_SESSION["oturumacan"]."' and Position_Id=1")); 
+    <?php $sqlonaypara=mysqli_fetch_array(mysqli_query($db,"select SUM(Money_TranslateTL) from moneys where User_UserName='".$_SESSION["oturumacan"]."' and Position_Id=1")); 
           if(null==$sqlonaypara[0]){$sqlonaypara[0]=0;}//adminden onaylanan paraların hesapını sqlonaypara'ya aktarmak ve boşsa 0 yapmak.
-          $sqlpara=mysqli_fetch_array(mysqli_query($db,"select SUM(Money_Amount) from moneys where User_UserName='".$_SESSION["oturumacan"]."' and Position_Id=3")); 
-          if(null==$sqlpara[0]){$sqlpara[0]=0;}//adminden onay bekleyen paraların hesapını sqlpara'ya aktarmak ve boşsa 0 yapmak.?> 
+          $Tlpara=mysqli_fetch_array(mysqli_query($db,"select SUM(Money_Amount) from moneys where User_UserName='".$_SESSION["oturumacan"]."' and Money_Type='TL' and Position_Id=3")); 
+          $Europara=mysqli_fetch_array(mysqli_query($db,"select SUM(Money_Amount) from moneys where User_UserName='".$_SESSION["oturumacan"]."' and Money_Type='EURO' and Position_Id=3")); 
+          $Dolarpara=mysqli_fetch_array(mysqli_query($db,"select SUM(Money_Amount) from moneys where User_UserName='".$_SESSION["oturumacan"]."' and Money_Type='KANADA DOLARI' and Position_Id=3")); 
+          $Yenpara=mysqli_fetch_array(mysqli_query($db,"select SUM(Money_Amount) from moneys where User_UserName='".$_SESSION["oturumacan"]."' and Money_Type='JAPON YENİ' and Position_Id=3")); 
+          if(!$Tlpara[0]){$Tlpara[0]=0;}
+          if(!$Europara[0]){$Europara[0]=0;}
+          if(!$Dolarpara[0]){$Dolarpara[0]=0;}
+          if(!$Yenpara[0]){$Yenpara[0]=0;}//adminden onay bekleyen paraların hesapını sqlpara'ya aktarmak ve boşsa 0 yapmak.?> 
     <label><h1>Onaylanan Bakiyeniz :</h1><?php echo $sqlonaypara[0]." TL";?></label>
-    <label><h1>Onaylanmayı Bekleyen Bakiyeniz :</h1><?php echo $sqlpara[0]." TL";?></label>
+    <label><h1>Onaylanmayı Bekleyen Bakiyeniz :</h1>
+      <?php echo $Tlpara[0]." TL , ".$Yenpara[0]." JAPON YENİ , ".$Europara[0]." EURO , " .$Dolarpara[0]." KANADA DOLARI";?></label>
   </div>
   <div div class="col-sm-12 add item">
     <h1>Para Ekle</h1>
     <form method="post" >
-      <div class="input-group mb-4 mbmoney">
+      <div class="input-group mb-4 mbmoneyozel">
+        <div class="input-group-prepend">
+          <span class="input-group-text title">Para Cinsi</span>
+        </div>
+        <select id="money_type" name="money_type" class="custom-select form-control">
+          <option selected>Lütfen Ürün Seçiniz</option>
+          <option value="JAPON YENİ">JAPON YENİ</option>
+          <option value="EURO">EURO</option>
+          <option value="KANADA DOLARI">KANADA DOLARI</option>
+          <option value="TL">TL</option>
+        </select>
+      </div>
+      <div class="input-group mb-4 mbmoney mbort">
         <div class="input-group-prepend">
           <span class="input-group-text title">Eknenecek Bakiye Miktarı</span>
         </div>
@@ -80,8 +101,13 @@
   </div>
 </div>
 <?php 
-  if(p("button_money")){//parayı onay bekleme durumu ile eklemek.
-    $sqlekle=mysqli_query($db,"insert into moneys (User_UserName,Money_Amount,Position_Id) values('".$_SESSION["oturumacan"]."',".intval(p("money_amount")).",3);");
+  if(p("button_money") and p("money_type")){//parayı onay bekleme durumu ile eklemek.
+    if(p("money_type")!="TL"){
+      $sqlekle=mysqli_query($db,"insert into moneys (User_UserName,Money_Amount,Money_Type,Money_TranslateTL,Position_Id) values('".$_SESSION["oturumacan"]."',".intval(p("money_amount")).",'".p("money_type")."',0,3);");
+    }
+    else{
+      $sqlekle=mysqli_query($db,"insert into moneys (User_UserName,Money_Amount,Money_Type,Money_TranslateTL,Position_Id) values('".$_SESSION["oturumacan"]."',".intval(p("money_amount")).",'".p("money_type")."',".intval(p("money_amount")).",3);");
+    }
     if ($sqlekle) {
           echo "<script> alert ('Bakiyeniz Eklendi..'); </script> 
           setTimeout(".header("refresh:0;url=add-money.php").", 1000);";

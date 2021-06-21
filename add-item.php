@@ -41,9 +41,11 @@
           <?php } elseif($type[$x]=='Alıcı'){?>
             <a href="add-money.php"><li>Para Ekle</li></a>
             <a href="get-item.php"><li>Ürün Alma</li></a>
+            <a href="report.php"><li>Rapor</li></a>
           <?php } elseif($type[$x]=='Satıcı'){?>
             <a href="add-item.php"  class="active"><li>Ürün Ekle</li></a>
-          <?php } ?>
+            <?php if(count($type)<2){?> <a href="report.php"><li>Rapor</li></a> <?php } 
+          } ?>
       <?php } ?>
       <a href="home.php"><li>Profil</li></a>
       </ul>
@@ -139,7 +141,7 @@
 <?php 
   if(p("button_item")){ //ürünü onay bekleme durumu ile eklemek.
     $item_id=mysqli_fetch_array(mysqli_query($db,"select Item_Id from items where Item_Name='".p("item_name")."'"));
-    $sqlekle=mysqli_query($db,"insert into useritems (User_UserName,Item_Id,UserItem_Amount,UserItem_Unit_Price,Position_Id) values('".$_SESSION["oturumacan"]."',$item_id[0],".intval(p("item_amount")).",".intval(p("item_unitprice")).",3);");
+    $sqlekle=mysqli_query($db,"insert into useritems (User_UserName,Item_Id,UserItem_Amount,UserItem_Unit_Price,UserItem_Type,UserItem_Time,Position_Id) values('".$_SESSION["oturumacan"]."',".$item_id[0].",".intval(p("item_amount")).",".intval(p("item_unitprice")).",'Bekliyor',CURDATE(),3);");
     if ($sqlekle) {
           echo "<script> alert ('Ürününüz Eklendi..'); </script> 
           setTimeout(".header("refresh:0;url=add-item.php").", 1000);";

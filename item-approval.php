@@ -41,9 +41,11 @@
           <?php } elseif($type[$x]=='Alıcı'){?>
             <a href="add-money.php"><li>Para Ekle</li></a>
             <a href="get-item.php"><li>Ürün Alma</li></a>
+            <a href="report.php"><li>Rapor</li></a>
           <?php } elseif($type[$x]=='Satıcı'){?>
             <a href="add-item.php"><li>Ürün Ekle</li></a>
-          <?php } ?>
+            <?php if(count($type)<2){?> <a href="report.php"><li>Rapor</li></a> <?php } 
+          } ?>
       <?php } ?>
       <a href="home.php"><li>Profil</li></a>
       </ul>
@@ -97,8 +99,29 @@
 <?php 
   if(p("onay")){
     $id=p("yaz");
-    mysqli_query($db,"update useritems set Position_Id=1 where UserItem_Id=$id");
-    header("refresh:0;url=item-approval.php");
+    $urun=mysqli_fetch_array(mysqli_query($db,"select * from useritems where UserItem_Id=$id"));
+    $bekleyen=mysqli_fetch_array(mysqli_query($db,"select * from loginuseritem where Item_Id=".$urun["Item_Id"]." and   LoginUserItem_Unit_Price=".$urun["UserItem_Unit_Price"]));
+    if($bekleyen[0]){
+      if($urun["UserItem_Amount"]>=$bekleyen["LoginUserItem_Amount"]){
+         $newamount=$urun["UserItem_Amount"]-$bekleyen["LoginUserItem_Amount"];
+         mysqli_query($db,"insert into useritems (User_UserName,Item_Id,UserItem_Amount,UserItem_Unit_Price,UserItem_Type,UserItem_Time,Position_Id) values('".$bekleyen["User_UserName"]."',".$bekleyen["Item_Id"].",".$bekleyen["LoginUserItem_Amount"].",".$bekleyen["LoginUserItem_Unit_Price"].",'Alındı',CURDATE(),1);");
+         mysqli_query($db,"insert into useritems (User_UserName,Item_Id,UserItem_Amount,UserItem_Unit_Price,UserItem_Type,UserItem_Time,Position_Id) values('".$urun["User_UserName"]."',".$bekleyen["Item_Id"].",".$bekleyen["LoginUserItem_Amount"].",".$bekleyen["LoginUserItem_Unit_Price"].",'Satıldı',CURDATE(),1);");
+         if ($newamount!=0) {
+            mysqli_query($db,"update useritems set Position_Id=1, UserItem_Amount=$newamount  where UserItem_Id=$id");
+            mysqli_query($db,"delete from loginuseritem where LoginUserItem_Id=".$bekleyen["LoginUserItem_Id"]);
+          }
+      }
+      else{
+        $newamount=$bekleyen["LoginUserItem_Amount"]-$urun["UserItem_Amount"];
+        mysqli_query($db,"insert into useritems (User_UserName,Item_Id,UserItem_Amount,UserItem_Unit_Price,UserItem_Type,UserItem_Time,Position_Id) values('".$bekleyen["User_UserName"]."',".$urun["Item_Id"].",".$urun["UserItem_Amount"].",".$urun["UserItem_Unit_Price"].",'Alındı',CURDATE(),1);");
+        mysqli_query($db,"update useritems set UserItem_Type='Satıldı', Position_Id=1, UserItem_Time=CURDATE() where UserItem_Id=$id");
+        mysqli_query($db,"update loginuseritem set UserItem_Amount=$newamount  where UserItem_Id=$id");
+      }
+    }
+    else{
+      mysqli_query($db,"update useritems set Position_Id=1 where UserItem_Id=$id");
+      header("refresh:0;url=item-approval.php");
+    }
   }
   if(p("ret")){
     $id=p("yaz");

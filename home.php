@@ -39,9 +39,11 @@
        		<?php } elseif($type[$x]=='Alıcı'){?>
        			<a href="add-money.php"><li>Para Ekle</li></a>
             <a href="get-item.php"><li>Ürün Alma</li></a>
+            <a href="report.php"><li>Rapor</li></a>
        		<?php } elseif($type[$x]=='Satıcı'){?>
        			<a href="add-item.php"><li>Ürün Ekle</li></a>
-       		<?php } ?>
+            <?php if(count($type)<2){?> <a href="report.php"><li>Rapor</li></a> <?php } 
+          } ?>
   		<?php } ?>
   		<a href="home.php" class="active"><li>Profil</li></a>
       </ul>

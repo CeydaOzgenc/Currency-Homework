@@ -170,8 +170,14 @@
 	width: 32%;
 	float: left;
 }
+.getitem .mb-4{
+	width: 26%;
+}
 .mbort{
 	margin: 0 2%;
+}
+.mbson{
+	margin-right: 2%;
 }
 .custom-select{
 	background: #fff;
@@ -202,7 +208,10 @@
 	height: 40px;
 	margin-right: 2%;
 }
-.mbmoney input{
+.mbmoneyozel{
+	height: 40px;
+}
+.mbmoney input,.mbmoneyozel input{
 	height: 100%;
 }
 /*Get İtem*/
@@ -284,3 +293,7 @@ table input[type=submit]{
 	 font:17px 'Ubuntu', sans-serif;
 	 padding-top:10px;
 	}
+/*Report*/
+.report{
+	width: 25%;
+}

@@ -20,9 +20,9 @@
 				<input name="register_tel" type="" placeholder="Telefon Numaranız..">
 				<input name="register_adrress" type="text" placeholder="Adresiniz..">
 				<input id="lastinput"name="register_mail" type="email" placeholder="E-Mailiniz..">
-				<input name="register_usertype2" type="checkbox" >
+				<input name="register_usertype1" type="checkbox" >
 				<label>Alıcı</label>
-				<input name="register_usertype3" type="checkbox" >
+				<input name="register_usertype2" type="checkbox" >
 				<label>Satıcı</label>
 				<label id="user_type">Kullanıcı tipinizi seçmeniz gerekli..</label>
 				<input id="buton2" name="register" type="submit" value="Kayıt Ol">
@@ -34,10 +34,10 @@
 	if(p("register")){
 		$sqlsorgula=mysqli_query($db,"select * from users where User_UserName='".p("register_username")."'");
 		if(null==mysqli_fetch_row($sqlsorgula)){ //input'tan girilen kullanıcı bilgileri daha önce kayıt olmuş mu kontrol edilir
-			if (null!=p("register_usertype1") or null!=p("register_usertype2") or null!=p("register_usertype3")){ // Kullanıcı tipinin seçilme durumu kontrol edilir.
-				$usertype = array("Admin", "Alıcı", "Satıcı");
+			if (null!=p("register_usertype1") or null!=p("register_usertype2")){ // Kullanıcı tipinin seçilme durumu kontrol edilir.
+				$usertype = array("Alıcı", "Satıcı");
 				$sql = "insert into users (User_UserName,User_Password,User_Name,User_Surname,User_TC_Number,User_Tel_Number,User_Address,User_E_Mail) values('".p("register_username")."','".p("register_password")."','".p("register_name")."','".p("register_surname")."',".intval(p("register_tc")).",".intval(p("register_tel")).",'".p("register_adrress")."','".p("register_mail")."');";
-				for ($x=1;$x<4;$x++){
+				for ($x=1;$x<3;$x++){
 					$type="register_usertype".$x;
 					if(null!=p("$type")){ //Kullanıcı tiplerinin şeçilmiş olma durumunu kontrol etmek ve seçilenleri veritabanına eklemek
 						$sql .= "insert into usertypes (UserType_Name,User_UserName) values('".$usertype[$x-1]."','".p("register_username")."');";

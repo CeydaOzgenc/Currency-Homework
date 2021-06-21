@@ -41,9 +41,11 @@
           <?php } elseif($type[$x]=='Alıcı'){?>
             <a href="add-money.php"><li>Para Ekle</li></a>
             <a href="get-item.php"><li>Ürün Alma</li></a>
+            <a href="report.php"><li>Rapor</li></a>
           <?php } elseif($type[$x]=='Satıcı'){?>
             <a href="add-item.php"><li>Ürün Ekle</li></a>
-          <?php } ?>
+            <?php if(count($type)<2){?> <a href="report.php"><li>Rapor</li></a> <?php } 
+          } ?>
       <?php } ?>
       <a href="home.php"><li>Profil</li></a>
       </ul>
@@ -91,8 +93,25 @@
 <?php 
   if(p("onay")){
     $id=p("yaz");
-    mysqli_query($db,"update moneys set Position_Id=1 where Money_Id=$id");
-    header("refresh:0;url=money-approval.php");
+    $baglan = simplexml_load_file('http://www.tcmb.gov.tr/kurlar/today.xml');
+    $kur=$baglan->Currency;
+    $sqlürün=mysqli_fetch_array(mysqli_query($db,"select * from moneys where Money_Id=$id"));
+    if($sqlürün["Money_Type"]=="EURO"){
+      $para=($kur[3]->BanknoteSelling)*$sqlürün["Money_Amount"];
+    }
+    else if($sqlürün["Money_Type"]=="JAPON YENİ"){
+      $para=($kur[11]->BanknoteSelling)*$sqlürün["Money_Amount"];
+    }
+    else if($sqlürün["Money_Type"]=="KANADA DOLARI"){
+      $para=($kur[7]->BanknoteSelling)*$sqlürün["Money_Amount"];
+    }
+    if($sqlürün["Money_TranslateTL"]==0){
+      mysqli_query($db,"update moneys set Position_Id=1,Money_TranslateTL=$para where Money_Id=$id");
+      header("refresh:0;url=money-approval.php");
+    }else{
+      mysqli_query($db,"update moneys set Position_Id=1 where Money_Id=$id");
+      header("refresh:0;url=money-approval.php");
+    }
   }
   if(p("ret")){
     $id=p("yaz");

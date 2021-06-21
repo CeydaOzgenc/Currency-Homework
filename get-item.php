@@ -41,9 +41,11 @@
           <?php } elseif($type[$x]=='Alıcı'){?>
             <a href="add-money.php"><li>Para Ekle</li></a>
             <a href="get-item.php" class="active"><li>Ürün Alma</li></a>
+            <a href="report.php"><li>Rapor</li></a>
           <?php } elseif($type[$x]=='Satıcı'){?>
             <a href="add-item.php"><li>Ürün Ekle</li></a>
-          <?php } ?>
+            <?php if(count($type)<2){?> <a href="report.php"><li>Rapor</li></a> <?php } 
+          } ?>
       <?php } ?>
       <a href="home.php"><li>Profil</li></a>
       </ul>
@@ -51,7 +53,7 @@
   </div>
 </div>
 <div class="container">
-  <div div class="col-sm-12 add item top">
+  <div div class="col-sm-12 add item top getitem">
     <h1>Ürün Alımı</h1>
     <form method="post" >
       <div class="input-group mb-4">
@@ -78,6 +80,12 @@
         </div>
         <input id="item_amount" type="text" name="item_amount" class="form-control">
       </div>
+      <div class="input-group mb-4 mbson">
+        <div class="input-group-prepend">
+          <span class="input-group-text title">Ürün Birim Fiyatı</span>
+        </div>
+        <input id="item_unitprice" type="text" name="item_unitprice" class="form-control">
+      </div>
       <input name="button_item" type="submit" value="Ürünü Sorgula">
       <div class="query_money">
         <h1 id="moneytitle">Ödemeniz Gereken Tutar :</h1>
@@ -95,10 +103,15 @@
   </div>
 </div>
 <?php 
-  function money($name,$amount,$position){
+  function money($name,$amount,$unitprice,$position){
     $db= new mysqli("localhost","root","","bourse_project");
     $item_id=mysqli_fetch_array(mysqli_query($db,"select Item_Id from items where Item_Name='$name'"));
-    $sqlürün=mysqli_query($db,"select * from useritems where Item_Id=$item_id[0] and  Position_Id=1 ORDER BY UserItem_Unit_Price ");
+    if($unitprice){
+      $sqlürün=mysqli_query($db,"select * from useritems where Item_Id=$item_id[0] and UserItem_Unit_Price=".$unitprice." and UserItem_Type='Bekliyor' and Position_Id=1 ORDER BY UserItem_Unit_Price ");
+    }
+    else{
+      $sqlürün=mysqli_query($db,"select * from useritems where Item_Id=$item_id[0] and UserItem_Type='Bekliyor' and Position_Id=1 ORDER BY UserItem_Unit_Price ");
+    }
     if(mysqli_num_rows ($sqlürün)!=0){
       $item=intval(p("item_amount"));
       $money=0;
@@ -108,6 +121,9 @@
             $money+=($item*$row["UserItem_Unit_Price"]);
             if($position==2){
               $new_amount=$row["UserItem_Amount"]-$item;
+              $veri=mysqli_fetch_array(mysqli_query($db,"select * from useritems where UserItem_Id=".$row["UserItem_Id"]));
+              mysqli_query($db,"insert into useritems (User_UserName,Item_Id,UserItem_Amount,UserItem_Unit_Price,UserItem_Type,UserItem_Time,Position_Id) values('".$_SESSION["oturumacan"]."',".$item_id[0].",".$item.",".$row["UserItem_Unit_Price"].",'Alındı',CURDATE(),1);");
+              mysqli_query($db,"insert into useritems (User_UserName,Item_Id,UserItem_Amount,UserItem_Unit_Price,UserItem_Type,UserItem_Time,Position_Id) values('".$veri["User_UserName"]."',".$item_id[0].",".$item.",".$row["UserItem_Unit_Price"].",'Satıldı',CURDATE(),1);");
               mysqli_query($db,"update useritems set UserItem_Amount=$new_amount where UserItem_Id=".$row["UserItem_Id"]);
             }
           }
@@ -115,15 +131,18 @@
             $item-=$row["UserItem_Amount"];
             $money+=($row["UserItem_Amount"]*$row["UserItem_Unit_Price"]);
             if($position==2){
-              mysqli_query($db,"delete from useritems where UserItem_Id=".$row["UserItem_Id"]);
+              mysqli_query($db,"update useritems set UserItem_Type='Satıldı' where UserItem_Id=".$row["UserItem_Id"]);
+              mysqli_query($db,"insert into useritems (User_UserName,Item_Id,UserItem_Amount,UserItem_Unit_Price,UserItem_Type,UserItem_Time,Position_Id) values('".$_SESSION["oturumacan"]."',".$item_id[0].",".$row["UserItem_Amount"].",".$row["UserItem_Unit_Price"].",'Alındı',CURDATE(),1);");
             }
           }
         }
       }
+      $money+=($money/100);
       if($position==1 or $position==2){
         $parasorgula=mysqli_query($db,"select * from moneys where User_UserName='".$_SESSION["oturumacan"]."' and Position_Id=1");
         $usermoney=0;
-        if(mysqli_num_rows ($parasorgula)!=0){
+        mysqli_query($db,"insert into useritems (User_UserName,Item_Id,UserItem_Amount,UserItem_Unit_Price,UserItem_Type,UserItem_Time,Position_Id) values('".$_SESSION["oturumacan"]."',".$item_id[0].",".$row["UserItem_Amount"].",".$row["UserItem_Unit_Price"].",'',CURDATE(),1);");
+        if(mysqli_num_rows ($parasorgula)!=0 ){
           while ($user=mysqli_fetch_array($parasorgula)) {
             $usermoney+=$user["Money_Amount"];
             if($money>0 and $position==2){
@@ -138,40 +157,78 @@
             }
           }
           if($position==2){
-            echo"<script> alert ('Ürünün alışı gerçekleşmiştir..'); </script>
+            echo"<script> alert ('Ürünün alışı gerçekleşmiştir.'); </script>
             setTimeout(".header("refresh:0;url=get-item.php").", 1000);";
           }
         }
         if($usermoney>=$money and $position==1){
-          money($name,$amount,2);
+          money($name,$amount,$unitprice,2);
         }
         else if($usermoney<$money and $position==1){
           echo"<script> alert ('Paranız yeterli değil!!'); </script>
           setTimeout(".header("refresh:0;url=get-item.php").", 1000);";
         }
       }
-      echo "<script>
-      document.getElementById('item_name').value='".$name."';
-      document.getElementById('item_amount').value='".$amount."';
-      document.getElementById('moneytext').innerHTML = ".$money." + ' TL';
-      document.getElementsByClassName('query_money')[0].style.display= 'block';
-      </script>";
+      $miktarsorgula=mysqli_query($db,"select SUM(UserItem_Amount) from useritems where  UserItem_Type='Bekliyor' and Item_Id=$item_id[0] and Position_Id=1");
+      $miktar=mysqli_fetch_array($miktarsorgula);
+      if($amount>$miktar[0]){
+        echo "<script>
+        document.getElementById('item_name').value='".$name."';
+        document.getElementById('item_amount').value='".$amount."';
+        document.getElementById('item_unitprice').value='".$unitprice."';
+        document.getElementById('moneytext').innerHTML = ".$money." + ' TL';
+        document.getElementById('moneytitle').innerHTML= 'Ürün stokta ".$miktar[0]." adet bulunmaktadır. Ödemeniz Gereken Tutar : ';
+        document.getElementsByClassName('query_money')[0].style.width= '82%';
+        document.getElementsByClassName('query_money')[0].style.display= 'block';
+        </script>";
+        if($unitprice and ($position==1 or $position==2)){
+          mysqli_query($db,"insert into loginuseritem (User_UserName,Item_Id,LoginUserItem_Amount,LoginUserItem_Unit_Price,Position_Id) values('".$_SESSION["oturumacan"]."',".$item_id[0].",".$item.",".$unitprice.",3);");
+          echo "<script>alert('Seçtiğiniz ürün satıcı tarafından yüklenince aktifleşicektir..')</script>";
+        }
+      }
+      else{
+        echo "<script>
+        document.getElementById('item_name').value='".$name."';
+        document.getElementById('item_amount').value='".$amount."';
+        document.getElementById('item_unitprice').value='".$unitprice."';
+        document.getElementById('moneytext').innerHTML = ".$money." + ' TL';
+        document.getElementsByClassName('query_money')[0].style.display= 'block';
+        </script>";
+      }
     }
     else{
       echo "<script>
       document.getElementById('moneytext').innerHTML = 'Ürün stokta bulunmamaktadır..';
       document.getElementsByClassName('query_money')[0].style.display= 'block';
       document.getElementById('moneytitle').style.display= 'none';
-      document.getElementById('moneybutton').style.display= 'none';
       </script>";
+      if($unitprice==NULL){
+        echo "<script>document.getElementById('moneybutton').style.display= 'none';</script>";
+      }
+      else if($position==1 or $position==2){
+        mysqli_query($db,"insert into loginuseritem (User_UserName,Item_Id,LoginUserItem_Amount,LoginUserItem_Unit_Price,Position_Id) values('".$_SESSION["oturumacan"]."',".$item_id[0].",".$amount.",".$unitprice.",3);");
+        echo "<script>alert('Seçtiğiniz ürün satıcı tarafından yüklenince aktifleşicektir..')</script>";
+      }
+      else{
+        echo "<script>
+        document.getElementById('item_name').value='".$name."';
+        document.getElementById('item_amount').value='".$amount."';
+        document.getElementById('item_unitprice').value='".$unitprice."';
+        </script>";
+      }
     }
   }
   
   if(p("button_item")){
-    money(p("item_name"),p("item_amount"),0);
+    if(p("item_name") and p("item_amount")){
+      money(p("item_name"),p("item_amount"),p("item_unitprice"),0);
+    }
+    else{
+      echo "<script>alert('Ürün adi ve ürün miktarı seçilmesi zorunludur!')</script>";
+    }
   }
   if(p("button_money")){
-    money(p("item_name"),p("item_amount"),1);
+    money(p("item_name"),p("item_amount"),p("item_unitprice"),1);
   }
   ?>
 </body>
